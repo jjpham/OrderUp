@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Restaurant, Order, Menu_Item
 from django.urls import reverse_lazy
-from .forms import Menu_ItemForm
+from .forms import Menu_ItemForm, OrderForm
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -20,13 +20,28 @@ def restaurants_index(request):
 def restaurants_detail(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
     menu_item_form = Menu_ItemForm()
-
+    order_form = OrderForm()
     return render(request,'restaurants/detail.html',{
         'restaurant':restaurant, 'menu_item_form':menu_item_form,
+        'order_form':order_form
+    })
+def orders_detail(request, order_id):
+    order = Order.objects.get(id=order_id)
+    return render(request,'orders/detail.html',{
+        'order':order,
     })
 @login_required
 def add_menu_item(request, restaurant_id):
     form =Menu_ItemForm(request.POST)
+    if form.is_valid():
+        new_menu_item = form.save(commit=False)
+        new_menu_item.restaurant_id= restaurant_id
+        new_menu_item.user = request.user
+        new_menu_item.save()
+    return redirect('detail',restaurant_id=restaurant_id)
+@login_required
+def add_order(request, restaurant_id):
+    form =OrderForm(request.POST)
     if form.is_valid():
         new_menu_item = form.save(commit=False)
         new_menu_item.restaurant_id= restaurant_id
@@ -55,6 +70,16 @@ class Menu_itemUpdate(LoginRequiredMixin, UpdateView):
 
 class Menu_itemDelete(LoginRequiredMixin, DeleteView):
     model = Menu_Item
+    def get_success_url(self):
+        restaurant_id = self.object.restaurant_id
+        success_url = reverse_lazy('detail', kwargs={'restaurant_id': restaurant_id})
+        return success_url
+class OrderUpdate(LoginRequiredMixin, UpdateView):
+    model = Order
+    fields = ['name','cost','phone_number','address']
+
+class OrderDelete(LoginRequiredMixin, DeleteView):
+    model = Order
     def get_success_url(self):
         restaurant_id = self.object.restaurant_id
         success_url = reverse_lazy('detail', kwargs={'restaurant_id': restaurant_id})

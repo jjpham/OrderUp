@@ -44,3 +44,5 @@ class Order(models.Model):
         return total_cost
     def __str__(self):
         return self.name
+    def get_absolute_url(self):
+        return reverse('detail',kwargs={'restaurant_id':self.restaurant.id})
