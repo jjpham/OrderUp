@@ -84,12 +84,22 @@ WSGI_APPLICATION = 'orderup.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-DATABASES = {
-    'default': dj_database_url.config(     
-    default='postgresql://postgres:postgres@localhost:5432/<name_of_database>',        
-    conn_max_age=600    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(     
+#     default='postgresql://postgres:postgres@localhost:5432/pham',        
+#     conn_max_age=600    )
+# }
 
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'neondb',
+    'USER': 'jjpham',
+    'PASSWORD': 'Huyrpq2DU1bY',
+    'HOST': 'ep-blue-king-712307.us-east-2.aws.neon.tech',
+    'PORT': '5432',
+  }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
